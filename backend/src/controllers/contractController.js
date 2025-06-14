@@ -219,18 +219,25 @@ const getContract = async (req, res) => {
       req.user.role === "general_manager" &&
       contract.created_by !== req.user.id
     ) {
-      return res.status(403).json({
-        message: "Access denied - you can only view your own contracts",
-      });
+
+      return res
+        .status(403)
+        .json({
+          message: "Access denied - you can only view your own contracts",
+        });
     }
 
     if (
       req.user.role === "supplier" &&
       contract.supplier_name.toLowerCase() !== req.user.name.toLowerCase()
     ) {
-      return res.status(403).json({
-        message: "Access denied - you can only view contracts assigned to you",
-      });
+
+      return res
+        .status(403)
+        .json({
+          message:
+            "Access denied - you can only view contracts assigned to you",
+        });
     }
 
     console.log(
