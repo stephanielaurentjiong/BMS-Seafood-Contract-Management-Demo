@@ -219,6 +219,7 @@ const getContract = async (req, res) => {
       req.user.role === "general_manager" &&
       contract.created_by !== req.user.id
     ) {
+
       return res
         .status(403)
         .json({
@@ -230,6 +231,7 @@ const getContract = async (req, res) => {
       req.user.role === "supplier" &&
       contract.supplier_name.toLowerCase() !== req.user.name.toLowerCase()
     ) {
+
       return res
         .status(403)
         .json({
