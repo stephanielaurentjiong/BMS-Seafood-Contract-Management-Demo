@@ -7,6 +7,7 @@ const PORT = 3001;
 
 // Import routes
 const authRoutes = require("./src/routes/auth");
+const contractRoutes = require("./src/routes/contracts");
 
 // Middleware
 app.use(cors());
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/contracts", contractRoutes);
 
 // Root route
 app.get("/", (req, res) => {
@@ -27,6 +29,12 @@ app.get("/", (req, res) => {
       auth: {
         register: "POST /api/auth/register",
         login: "POST /api/auth/login",
+      },
+      contracts: {
+        create: "POST /api/contracts (GM only)",
+        list: "GET /api/contracts (role-filtered)",
+        single: "GET /api/contracts/:id",
+        status: "PUT /api/contracts/:id/status (GM only)",
       },
       test: "GET /api/test",
       health: "GET /api/health",
@@ -78,6 +86,27 @@ app.get("/api/health", async (req, res) => {
     });
   }
 });
+
+const { authenticateToken, requireRole } = require("./src/middleware/auth");
+
+app.get("/api/test-auth", authenticateToken, (req, res) => {
+  res.json({
+    message: "🔐 Auth working!",
+    user: req.user,
+  });
+});
+
+app.get(
+  "/api/test-gm",
+  authenticateToken,
+  requireRole(["general_manager"]),
+  (req, res) => {
+    res.json({
+      message: "🎯 GM access working!",
+      user: req.user,
+    });
+  }
+);
 
 // Start server
 app.listen(PORT, () => {
