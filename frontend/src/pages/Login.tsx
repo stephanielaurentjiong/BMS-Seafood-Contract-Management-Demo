@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { authAPI } from "../utils/api";
 import { useAuth } from "../hooks/useAuth";
 
@@ -119,18 +119,15 @@ const Login: React.FC = () => {
           </div>
 
           <div className="text-center">
-            <div className="bg-gray-50 p-4 rounded-md">
-              <p className="text-xs text-gray-600 mb-2">Test accounts:</p>
-              <p className="text-xs text-gray-500">
-                <strong>GM:</strong> gm@test.com
-                <br />
-                <strong>Supplier:</strong> supplier@test.com
-                <br />
-                <strong>Admin:</strong> admin@test.com
-                <br />
-                <strong>Password:</strong> password123
-              </p>
-            </div>
+            <p className="text-sm text-gray-600">
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                Register here
+              </Link>
+            </p>
           </div>
         </form>
       </div>

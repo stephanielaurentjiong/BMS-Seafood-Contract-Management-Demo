@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecs = require("./src/config/swagger");
 require("dotenv").config();
 
 const app = express();
@@ -12,6 +14,17 @@ const contractRoutes = require("./src/routes/contracts");
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Swagger UI setup
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpecs, {
+    explorer: true,
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Shrimp Contract Management API Documentation",
+  })
+);
 
 // Routes
 app.use("/api/auth", authRoutes);
