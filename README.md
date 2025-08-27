@@ -40,6 +40,7 @@ Built with modern web technologies (React + TypeScript frontend, Node.js + Postg
 <img src="https://github.com/user-attachments/assets/b1c525fd-0bba-49fe-9491-445b76f83cd3" alt="Screenshot 4" width="400">
 
 
+
 ## Architecture
 
 - **Backend**: Node.js + Express + PostgreSQL
