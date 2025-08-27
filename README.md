@@ -24,12 +24,6 @@ Built with modern web technologies (React + TypeScript frontend, Node.js + Postg
 5. **Automatic Processing**: Closed contracts are transferred to the database system with one click
 6. **Centralized Data Management**: All contract data automatically captured and available in admin dashboard
 
-### Key Workflow Benefits
-- **Eliminated Manual Steps**: No more WhatsApp copying, pasting, or Excel data entry
-- **Real-time Collaboration**: Instant updates visible to all parties
-- **Data Accuracy**: Eliminates transcription errors from manual processes
-- **Audit Trail**: Complete history of all contract changes and negotiations
-- **Scalability**: System handles multiple contracts and suppliers simultaneously
 
 ## Features
 
@@ -38,7 +32,13 @@ Built with modern web technologies (React + TypeScript frontend, Node.js + Postg
 - **Real-time Contract Collaboration**
 - **WhatsApp Integration** (coming soon)
 - **Excel Import/Export** (coming soon)
-- **Complete Audit Trail**
+
+ 
+<img src="https://github.com/user-attachments/assets/bba8c2f0-a086-4276-a533-d6c425e60fe5" alt="Screenshot 1" width="400">
+<img src="https://github.com/user-attachments/assets/25872bcb-79df-4b90-b1ab-98bcfa2bb5a5" alt="Screenshot 2" width="400">
+<img src="https://github.com/user-attachments/assets/bad927b6-f657-47f0-a99e-41a422b8615b" alt="Screenshot 3" width="400">
+<img src="https://github.com/user-attachments/assets/b1c525fd-0bba-49fe-9491-445b76f83cd3" alt="Screenshot 4" width="400">
+
 
 ## Architecture
 
