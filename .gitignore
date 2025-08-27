@@ -6,6 +6,8 @@ yarn-error.log*
 
 # Environment variables (IMPORTANT!)
 .env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
@@ -38,6 +40,25 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+# Test coverage
+coverage/
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp
+
+# Security and secrets
+*.pem
+*.p12
+*.key
+*.crt
+*.cert
+*secret*
+*credential*
+config/secrets.js
+config/keys.js
 
 # Package lock files (optional - you can commit these)
 package-lock.json

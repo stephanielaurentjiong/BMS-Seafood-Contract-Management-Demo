@@ -1,0 +1,1 @@
+export type AdminTabType = "database-system" | "user-management" | "system-settings";

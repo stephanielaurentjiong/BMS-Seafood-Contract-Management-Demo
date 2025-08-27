@@ -29,7 +29,7 @@ const authenticateToken = async (req, res, next) => {
     // Add user to request object
     req.user = result.rows[0];
 
-    console.log(`🔐 Authenticated user: ${req.user.email} (${req.user.role})`);
+    console.log(`Authenticated user: ${req.user.email} (${req.user.role})`);
     next();
   } catch (error) {
     console.error("Authentication error:", error);
@@ -55,7 +55,7 @@ const requireRole = (allowedRoles) => {
 
       if (!allowedRoles.includes(req.user.role)) {
         console.log(
-          `❌ Access denied: ${req.user.email} (${req.user.role}) tried to access ${allowedRoles} endpoint`
+          `Access denied: ${req.user.email} (${req.user.role}) tried to access ${allowedRoles} endpoint`
         );
         return res.status(403).json({
           message: "Access denied - insufficient permissions",
@@ -64,7 +64,7 @@ const requireRole = (allowedRoles) => {
         });
       }
 
-      console.log(`✅ Role check passed: ${req.user.email} (${req.user.role})`);
+      console.log(`Role check passed: ${req.user.email} (${req.user.role})`);
       next();
     } catch (error) {
       console.error("Role check error:", error);

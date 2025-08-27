@@ -10,21 +10,21 @@ const pool = new Pool({
 
 // Test connection
 pool.on("connect", () => {
-  console.log("📦 Connected to PostgreSQL database");
+  console.log("Connected to PostgreSQL database");
 });
 
 pool.on("error", (err) => {
-  console.error("❌ Database connection error:", err);
+  console.error("Database connection error:", err);
 });
 
 // Test the connection on startup
 pool
   .query("SELECT NOW()")
   .then(() => {
-    console.log("✅ Database connection test successful");
+    console.log("Database connection test successful");
   })
   .catch((err) => {
-    console.error("❌ Database connection test failed:", err);
+    console.error("Database connection test failed:", err);
   });
 
 module.exports = pool;

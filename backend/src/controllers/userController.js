@@ -1,140 +1,276 @@
-// Create User Controller
+/**
+ * @fileoverview User Controller
+ * 
+ * Controller for user authentication and management operations.
+ * Updated to use the new User model and validation middleware.
+ * 
+ *
+ */
 
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("../config/database");
+const User = require("../models/User");
 
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "24h" });
+/**
+ * Generate JWT token for user
+ * 
+ * @param {string} userId - User UUID
+ * @param {string} email - User email  
+ * @param {string} role - User role
+ * @returns {string} JWT token
+ */
+const generateToken = (userId, email, role) => {
+  return jwt.sign(
+    { userId, email, role }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: "24h" }
+  );
 };
 
+/**
+ * Register a new user
+ * Validation is handled by middleware, model handles business logic
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const register = async (req, res) => {
   try {
     const { email, name, password, role } = req.body;
 
-    // Validate input
-    if (!email || !name || !password || !role) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+    // Create user using model (includes validation and password hashing)
+    const newUser = await User.create({
+      email,
+      name, 
+      password,
+      role
+    });
 
-    // Validate role (before sending to database)
-    const validRoles = ["general_manager", "supplier", "administrator"];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({
-        message: "Invalid role. Must be one of: general_manager, supplier, administrator",
+    // Generate token
+    const token = generateToken(newUser.id, newUser.email, newUser.role);
+
+    console.log(`User registered: ${newUser.email} (${newUser.role})`);
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: newUser,
+      token
+    });
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    
+    // Handle known validation errors
+    if (error.message.includes('Email address already registered')) {
+      return res.status(409).json({ 
+        message: error.message,
+        error_type: 'conflict'
+      });
+    }
+    
+    if (error.message.includes('Invalid role') || error.message.includes('required')) {
+      return res.status(400).json({ 
+        message: error.message,
+        error_type: 'validation_error'
       });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
-
-    // Validate password strength
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
-    }
-
-    // Check if user exists
-    const userExists = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-    if (userExists.rows.length > 0) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
-    const result = await pool.query(
-      "INSERT INTO users (email, name, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, email, name, role",
-      [email, name, hashedPassword, role]
-    );
-
-    const user = result.rows[0];
-    const token = generateToken(user.id);
-
-    console.log(`✅ New user registered: ${user.email} (${user.role})`);
-
-    res.status(201).json({
-      message: "User created successfully",
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
+    res.status(500).json({ 
+      message: "Server error during registration",
+      error_type: 'server_error'
     });
-  } catch (error) {
-    console.error("Register error:", error);
-
-    // Handle specific database errors
-    if (error.code === "23505") {
-      // Unique constraint violation
-      return res.status(400).json({ message: "Email already exists" });
-    }
-    if (error.code === "23514") {
-      // Check constraint violation
-      return res.status(400).json({ message: "Invalid role provided" });
-    }
-
-    // Generic server error
-    res.status(500).json({ message: "Server error" });
   }
 };
 
+/**
+ * Login user with email and password
+ * Validation is handled by middleware, model handles authentication
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+    // Verify password using model
+    const user = await User.verifyPassword(email, password);
+    
+    if (!user) {
+      return res.status(401).json({ 
+        message: "Invalid email or password",
+        error_type: 'authentication_error'
+      });
     }
 
-    // Find user
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-    if (result.rows.length === 0) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
+    // Generate token
+    const token = generateToken(user.id, user.email, user.role);
 
-    const user = result.rows[0];
-
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    const token = generateToken(user.id);
-
-    console.log(`✅ User logged in: ${user.email} (${user.role})`);
+    console.log(`User logged in: ${user.email} (${user.role})`);
 
     res.json({
       message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
+      user,
+      token
     });
+
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      message: "Server error during login",
+      error_type: 'server_error'
+    });
   }
 };
 
-module.exports = { register, login };
+/**
+ * Get current user profile
+ * Requires authentication middleware
+ * 
+ * @param {Object} req - Express request object (with user from auth middleware)
+ * @param {Object} res - Express response object
+ */
+const getProfile = async (req, res) => {
+  try {
+    // User is already available from auth middleware
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        message: "User not found",
+        error_type: 'not_found'
+      });
+    }
+
+    res.json({
+      message: "Profile retrieved successfully",
+      user
+    });
+
+  } catch (error) {
+    console.error("Get profile error:", error);
+    res.status(500).json({ 
+      message: "Server error retrieving profile",
+      error_type: 'server_error'
+    });
+  }
+};
+
+/**
+ * Update user profile
+ * Requires authentication middleware and validation
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const updateData = req.body;
+
+    // Update user using model
+    const updatedUser = await User.updateById(userId, updateData);
+    
+    if (!updatedUser) {
+      return res.status(404).json({ 
+        message: "User not found",
+        error_type: 'not_found'
+      });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error("Update profile error:", error);
+    
+    if (error.message.includes('Email address already in use')) {
+      return res.status(409).json({ 
+        message: error.message,
+        error_type: 'conflict'
+      });
+    }
+
+    res.status(500).json({ 
+      message: "Server error updating profile",
+      error_type: 'server_error'
+    });
+  }
+};
+
+/**
+ * Change user password
+ * Requires authentication middleware and validation
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    // Update password using model
+    await User.updatePassword(userId, newPassword, currentPassword);
+
+    res.json({
+      message: "Password updated successfully"
+    });
+
+  } catch (error) {
+    console.error("Change password error:", error);
+    
+    if (error.message.includes('Current password is incorrect')) {
+      return res.status(400).json({ 
+        message: error.message,
+        error_type: 'validation_error'
+      });
+    }
+    
+    if (error.message.includes('User not found')) {
+      return res.status(404).json({ 
+        message: error.message,
+        error_type: 'not_found'
+      });
+    }
+
+    res.status(500).json({ 
+      message: "Server error changing password",
+      error_type: 'server_error'
+    });
+  }
+};
+
+/**
+ * Get user statistics (Admin only)
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getUserStatistics = async (req, res) => {
+  try {
+    const stats = await User.getStatistics();
+
+    res.json({
+      message: "User statistics retrieved successfully",
+      statistics: stats
+    });
+
+  } catch (error) {
+    console.error("Get user statistics error:", error);
+    res.status(500).json({ 
+      message: "Server error retrieving statistics",
+      error_type: 'server_error'
+    });
+  }
+};
+
+module.exports = { 
+  register, 
+  login, 
+  getProfile,
+  updateProfile,
+  changePassword,
+  getUserStatistics
+};
