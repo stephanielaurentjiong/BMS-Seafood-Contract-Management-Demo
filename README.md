@@ -30,16 +30,16 @@ Built with modern web technologies (React + TypeScript frontend, Node.js + Postg
 - **Role-based Authentication** (General Manager, Supplier, Administrator)
 - **Dynamic Pricing System** (handles any shrimp sizes using PostgreSQL JSONB)
 - **Real-time Contract Collaboration**
-- **WhatsApp Integration** (coming soon)
-- **Excel Import/Export** (coming soon)
+- **WhatsApp Integration** (cooking)
+- **Excel Import/Export** (cooking)
 
- 
-<img src="https://github.com/user-attachments/assets/bba8c2f0-a086-4276-a533-d6c425e60fe5" alt="Screenshot 1" width="400">
-<img src="https://github.com/user-attachments/assets/25872bcb-79df-4b90-b1ab-98bcfa2bb5a5" alt="Screenshot 2" width="400">
-<img src="https://github.com/user-attachments/assets/bad927b6-f657-47f0-a99e-41a422b8615b" alt="Screenshot 3" width="400">
-<img src="https://github.com/user-attachments/assets/b1c525fd-0bba-49fe-9491-445b76f83cd3" alt="Screenshot 4" width="400">
+<img width="1920" height="958" alt="Screenshot 2025-08-27 at 2 19 35 PM" src="https://github.com/user-attachments/assets/991c8513-e6f0-40f9-99c4-b13d90b28a59" />
 
+<img width="1920" height="962" alt="Screenshot 2025-08-27 at 2 20 46 PM" src="https://github.com/user-attachments/assets/21bb6761-b794-41f7-9f24-9a4b2a494bae" />
 
+<img width="1920" height="960" alt="Screenshot 2025-08-27 at 2 21 02 PM" src="https://github.com/user-attachments/assets/2f4e4f5b-7dd1-4c5d-864e-cb9f6a2dbc15" />
+
+<img width="1920" height="960" alt="Screenshot 2025-08-27 at 2 21 31 PM" src="https://github.com/user-attachments/assets/cbec6781-317c-4da2-8362-7583583c7859" />
 
 ## Architecture
 
